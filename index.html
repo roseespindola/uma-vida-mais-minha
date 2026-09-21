@@ -25,6 +25,14 @@ footer{padding:56px 0;text-align:center;background:var(--oliva2);color:#f7f1e7}f
 @media(max-width:860px){.section{padding:64px 0}.hero{min-height:auto}.hero-grid{grid-template-columns:1fr;gap:34px}.hero-copy{text-align:center}.cards{grid-template-columns:1fr 1fr}.scene-list{grid-template-columns:1fr}}
 @media(max-width:560px){.cards{grid-template-columns:1fr}.receive{padding:30px 22px}.price{font-size:3.5rem}.btn{width:100%;text-align:center}}
 </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-B27MYR2DQ1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-B27MYR2DQ1');
+</script>
 </head>
 <body>
 <header class="hero"><div class="wrap hero-grid">
@@ -103,5 +111,90 @@ footer{padding:56px 0;text-align:center;background:var(--oliva2);color:#f7f1e7}f
 <strong>Rosemary Espíndola</strong>
 <span>Terapeuta com especialização em Neurociência</span>
 </div></footer>
+<script>
+(function(){
+  function gtagSafe(){
+    if (typeof gtag === 'function') {
+      gtag.apply(null, arguments);
+    }
+  }
+
+  // ---- Visualização de seções (dispara 1x por carregamento) ----
+  var secoes = [
+    { seletorFilho: '.scene-list', evento: 'visualizou_dor' },
+    { seletorFilho: '.cards',      evento: 'visualizou_metodo' },
+    { seletorFilho: '.receive',    evento: 'visualizou_produto' },
+    { seletorFilho: 'section.offer', evento: 'visualizou_oferta', ehPropriaSecao: true },
+    { seletorFilho: '.faq',        evento: 'visualizou_duvidas' }
+  ];
+
+  if (window.IntersectionObserver) {
+    secoes.forEach(function(cfg){
+      var alvo = cfg.ehPropriaSecao
+        ? document.querySelector(cfg.seletorFilho)
+        : (function(){
+            var filho = document.querySelector(cfg.seletorFilho);
+            return filho ? filho.closest('section') : null;
+          })();
+
+      if (!alvo) return;
+
+      var observer = new IntersectionObserver(function(entries, obs){
+        entries.forEach(function(entry){
+          if (entry.isIntersecting) {
+            gtagSafe('event', cfg.evento);
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      observer.observe(alvo);
+    });
+  }
+
+  // ---- Scroll 90% da página (dispara 1x por carregamento) ----
+  var scroll90Disparado = false;
+  function checkScroll90(){
+    if (scroll90Disparado) return;
+    var scrollAtual = window.scrollY || window.pageYOffset;
+    var alturaJanela = window.innerHeight;
+    var alturaTotal = document.documentElement.scrollHeight;
+    if (alturaTotal <= alturaJanela) return; // pagina sem scroll suficiente
+    var percentualRolado = (scrollAtual + alturaJanela) / alturaTotal;
+    if (percentualRolado >= 0.9) {
+      scroll90Disparado = true;
+      gtagSafe('event', 'scroll_90');
+      window.removeEventListener('scroll', checkScroll90);
+    }
+  }
+  window.addEventListener('scroll', checkScroll90, { passive: true });
+  checkScroll90(); // cobre caso a pagina ja carregue quase no fim
+
+  // ---- Cliques nos botoes de compra ----
+  var btnTopo = document.querySelector('header.hero .btn');
+  if (btnTopo) {
+    btnTopo.addEventListener('click', function(){
+      gtagSafe('event', 'clique_comprar_topo');
+      gtagSafe('event', 'saida_checkout');
+    });
+  }
+
+  var btnOferta = document.querySelector('section.offer .btn');
+  if (btnOferta) {
+    btnOferta.addEventListener('click', function(){
+      gtagSafe('event', 'clique_comprar_oferta');
+      gtagSafe('event', 'saida_checkout');
+    });
+  }
+
+  var btnFaq = document.querySelector('.faq .btn');
+  if (btnFaq) {
+    btnFaq.addEventListener('click', function(){
+      gtagSafe('event', 'clique_comprar_faq');
+      gtagSafe('event', 'saida_checkout');
+    });
+  }
+})();
+</script>
 </body>
 </html>
